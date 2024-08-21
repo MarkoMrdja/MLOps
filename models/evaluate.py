@@ -2,6 +2,20 @@ import torch
 import torch.nn as nn
 
 def evaluate_model(model, test_loader, device, criterion=nn.CrossEntropyLoss()):
+    """
+    Evaluate the model on the test set.
+
+    Args:
+        model (nn.Module): The trained neural network model.
+        test_loader (DataLoader): DataLoader for the test set.
+        device (str): The device to run the evaluation on ('cpu' or 'cuda').
+        criterion (nn.Module): The loss function.
+
+    Returns:
+        val_loss (float): The average loss on the test set.
+        val_accuracy (float): The accuracy on the test set.
+    """
+
     running_loss = 0.0
     correct = 0
     total = 0
