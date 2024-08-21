@@ -1,6 +1,7 @@
 import torch
+import torch.nn as nn
 
-def evaluate_model(model, criterion, test_loader, device):
+def evaluate_model(model, test_loader, device, criterion=nn.CrossEntropyLoss()):
     running_loss = 0.0
     correct = 0
     total = 0

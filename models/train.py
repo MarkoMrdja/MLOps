@@ -1,4 +1,6 @@
-def train_model(model, criterion, train_loader, optimizer, num_epochs, device, return_avg_loss=False):
+import torch.nn as nn
+
+def train_model(model, train_loader, optimizer, device, criterion=nn.CrossEntropyLoss(), num_epochs=1, return_avg_loss=False):
     """
     Train the model for a specified number of epochs and optionally return the average loss.
 

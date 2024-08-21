@@ -3,23 +3,21 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 
-from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
+from hyperopt import fmin, tpe, hp, STATUS_OK
 from hyperopt.pyll.base import scope
 
-from models.fashion_cnn import FashionCNN, FashionCNN_Modular
+from models.fashion_cnn import FashionCNN
 from models.evaluate import evaluate_model
 from models.train import train_model
 
 
 # Run optimization
-def run_optimization(train_loader, val_loader):
+def run_optimization(train_loader, val_loader, device):
     """
     Runs the hyperparameter optimization using Hyperopt's TPE algorithm.
     """
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    num_epochs = 1
-    max_evals = 2  #default: 10
+    max_evals = 10  #default: 10
 
     # Objective function
     def objective(params):
@@ -29,7 +27,7 @@ def run_optimization(train_loader, val_loader):
         """
 
         # Model
-        model = FashionCNN_Modular(
+        model = FashionCNN(
             num_filters_layer1=params['num_filters_layer1'],
             num_filters_layer2=params['num_filters_layer2'],
             kernel_size_layer1=params['kernel_size_layer1'],
@@ -41,13 +39,13 @@ def run_optimization(train_loader, val_loader):
 
         # Loss and optimizer
         criterion = nn.CrossEntropyLoss()
-        optimizer = getattr(optim, params['optimizer'])(model.parameters(), lr=params['lr'])
+        optimizer = getattr(optim, params['optimizer'])(model.parameters(), lr=params['learning_rate'])
 
         # Training loop
-        model = train_model(model, criterion, train_loader, optimizer, num_epochs, device)
+        model = train_model(model=model, train_loader=train_loader, optimizer=optimizer, device=device)
 
         # Calculate accuracy
-        val_loss, val_accuracy = evaluate_model(model, criterion, val_loader, device)
+        val_loss, val_accuracy = evaluate_model(model=model, test_loader=val_loader, device=device)
 
         # Return dictionary with the negative accuracy that it's trying to minimize and status
         return {'loss': -val_accuracy, 'status': STATUS_OK}
@@ -62,7 +60,6 @@ def run_optimization(train_loader, val_loader):
         'dropout_rate': hp.uniform('dropout_rate', 0.3, 0.7),
         'activation_function': hp.choice('activation_function', ['ReLU', 'LeakyReLU', 'ELU']),
         'learning_rate': hp.loguniform('learning_rate', np.log(0.0001), np.log(0.1)),
-        'lr': hp.loguniform('lr', -5, -3),
         'optimizer': hp.choice('optimizer', ['Adam', 'SGD'])
     }
 
@@ -76,21 +73,11 @@ def run_optimization(train_loader, val_loader):
             'fc1_units': [128, 256, 512][best['fc1_units']],
             'dropout_rate': best['dropout_rate'],
             'activation_function': ['ReLU', 'LeakyReLU', 'ELU'][best['activation_function']],
-            'learning_rate': best['learning_rate']
+            'learning_rate': best['learning_rate'],
+            'optimizer': ['Adam', 'SGD'][best['optimizer']]
         }
 
-    # Create the best model with the correct parameters
-    best_model = FashionCNN_Modular(
-        num_filters_layer1=best_params['num_filters_layer1'],
-        num_filters_layer2=best_params['num_filters_layer2'],
-        kernel_size_layer1=best_params['kernel_size_layer1'],
-        kernel_size_layer2=best_params['kernel_size_layer2'],
-        fc1_units=best_params['fc1_units'],
-        dropout_rate=best_params['dropout_rate'],
-        activation_function=best_params['activation_function']
-    ).to(device)
-
-    return best_model
+    return best_params
 
 
 if __name__ == "__main__":
