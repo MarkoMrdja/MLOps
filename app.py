@@ -6,7 +6,7 @@ def run_flask():
     """
     Run the Flask API.
     """
-    app.run(port=8080, debug=True)
+    app.run(debug=True)
 
 
 if __name__ == '__main__':
