@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 import torch
 from PIL import Image
-from torchvision import transforms
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.save_load import load_model

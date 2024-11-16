@@ -17,7 +17,7 @@ def run_optimization(train_loader, val_loader, device):
     Runs the hyperparameter optimization using Hyperopt's TPE algorithm.
     """
 
-    max_evals = 10  #default: 10
+    max_evals = 3
 
     # Objective function
     def objective(params):

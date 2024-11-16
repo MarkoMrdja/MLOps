@@ -1,11 +1,11 @@
-from prefect import flow, task
+from prefect import flow, task, serve 
 from prefect.logging import get_run_logger
+from prefect.server.schemas.schedules import CronSchedule
 
 import torch
 import torch.optim as optim
 from typing import Tuple, Dict, Any
 
-import logging
 from data.load_data import load_data
 from data.blob_storage import upload_model
 from models.hyperoptimize import run_optimization
@@ -13,11 +13,6 @@ from models.train import train_model
 from models.evaluate import evaluate_model
 from models.fashion_cnn import FashionCNN
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 
 class ModelTrainingError(Exception):
     """Custom exception for model training errors"""
@@ -203,4 +198,10 @@ def training_pipeline() -> Tuple[float, float]:
 
 
 if __name__ == "__main__":
-    training_pipeline()
+    training_pipeline.serve(
+        name="daily-fashion-mnist-training",
+        work_pool_name="my-pool",
+        schedule=(CronSchedule(cron="0 2 * * *", timezone="UTC")),  # Runs at 2 AM UTC daily
+        description="Daily training of Fashion MNIST model",
+        tags=["ml", "training", "fashion-mnist"]
+    )
