@@ -200,8 +200,5 @@ def training_pipeline() -> Tuple[float, float]:
 if __name__ == "__main__":
     training_pipeline.serve(
         name="daily-fashion-mnist-training",
-        work_pool_name="my-pool",
-        schedule=(CronSchedule(cron="0 2 * * *", timezone="UTC")),  # Runs at 2 AM UTC daily
-        description="Daily training of Fashion MNIST model",
-        tags=["ml", "training", "fashion-mnist"]
+        cron="0 2 * * *"  # Runs at 2 AM UTC daily
     )
