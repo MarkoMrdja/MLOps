@@ -1,4 +1,5 @@
 import torch.nn as nn
+from utils.logger import logger
 
 def train_model(model, train_loader, optimizer, device, criterion=nn.CrossEntropyLoss(), num_epochs=1, return_avg_loss=False):
     """
@@ -31,7 +32,7 @@ def train_model(model, train_loader, optimizer, device, criterion=nn.CrossEntrop
             optimizer.step()
             running_loss += loss.item()
 
-        print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {running_loss / len(train_loader)}")
+        logger.info(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {running_loss / len(train_loader)}")
 
     if return_avg_loss:
         avg_loss = running_loss / len(train_loader)

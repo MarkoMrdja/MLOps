@@ -8,6 +8,7 @@ from hyperopt.pyll.base import scope
 
 from models.fashion_cnn import FashionCNN
 from models.evaluate import evaluate_model
+from utils.logger import logger
 from models.train import train_model
 
 
@@ -82,4 +83,4 @@ def run_optimization(train_loader, val_loader, device):
 
 if __name__ == "__main__":
     best_hyperparameters = run_optimization()
-    print(f"Best hyperparameters: {best_hyperparameters}")
+    logger.info(f"Best hyperparameters: {best_hyperparameters}")

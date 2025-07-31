@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import torch
 import os
 import io
+from utils.logger import logger
 
 load_dotenv()
 
@@ -38,7 +39,7 @@ def upload_model(model, accuracy):
     all_models_path = f"all_models/{model_filename}"
     all_blob_client = container_client.get_blob_client(all_models_path)
     all_blob_client.upload_blob(buffer, overwrite=True)
-    print(f"Uploaded to all_models: {model_filename}")
+    logger.info(f"Uploaded to all_models: {model_filename}")
 
     # Check if this model is better than the current best
     best_model_filename = get_best_model_filename()
@@ -55,21 +56,21 @@ def upload_model(model, accuracy):
         best_models_path = f"best_model/{model_filename}"
         best_blob_client = container_client.get_blob_client(best_models_path)
         best_blob_client.upload_blob(buffer, overwrite=True)
-        print(f"New best model saved: {model_filename}")
+        logger.info(f"New best model saved: {model_filename}")
         
         # Save locally as the best model
         local_best_model_path = f"./models/best_model/{model_filename}"
         os.makedirs(os.path.dirname(local_best_model_path), exist_ok=True)
         with open(local_best_model_path, "wb") as local_file:
             local_file.write(buffer.getvalue())
-        print(f"Saved locally: {local_best_model_path}")
+        logger.info(f"Saved locally: {local_best_model_path}")
 
         # Delete the old best model from Azure
         if best_model_filename:
             container_client.delete_blob(best_model_filename)
-            print(f"Deleted old best model: {best_model_filename}")
+            logger.info(f"Deleted old best model: {best_model_filename}")
     else:
-        print(f"Model {model_filename} is not better than the current best model.")
+        logger.info(f"Model {model_filename} is not better than the current best model.")
 
     buffer.close()
 
@@ -100,4 +101,4 @@ def cleanup_old_models():
     for blob in blob_list:
         if blob.last_modified < expiration_date:
             container_client.delete_blob(blob)
-            print(f"Deleted old model: {blob.name}")
+            logger.info(f"Deleted old model: {blob.name}")

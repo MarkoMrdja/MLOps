@@ -1,6 +1,7 @@
 import torch
 import os
 from data.blob_storage import upload_model, get_best_model
+from utils.logger import logger
 
 def save_model(model, accuracy):
     """
@@ -14,15 +15,15 @@ def save_model(model, accuracy):
     try:
         upload_model(model, accuracy)
     except Exception as e:
-        print(f"Error uploading model to blob storage: {e}")
-        print("Attempting to save model locally...")
+        logger.error(f"Error uploading model to blob storage: {e}")
+        logger.warning("Attempting to save model locally...")
 
         model_filename = f"model_{accuracy:.4f}.pth"
         local_path = f"./models/failed_to_upload/{model_filename}"
 
         torch.save(model, local_path)
 
-        print(f"Model saved locally as: {model_filename}")
+        logger.info(f"Model saved locally as: {model_filename}")
 
 def load_model():
     """
@@ -35,8 +36,8 @@ def load_model():
     try:
         model = get_best_model()
     except Exception as e:
-        print(f"Error loading model from blob storage: {e}")
-        print("Attempting to load model locally...")
+        logger.error(f"Error loading model from blob storage: {e}")
+        logger.warning("Attempting to load model locally...")
 
         local_dir = "./models/best_model/"
         
@@ -51,6 +52,6 @@ def load_model():
         
         model = torch.load(local_path)
 
-        print(f"Model loaded locally from: {local_path}")
+        logger.info(f"Model loaded locally from: {local_path}")
 
     return model

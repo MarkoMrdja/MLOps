@@ -8,6 +8,7 @@ from models.hyperoptimize import run_optimization
 from models.train import train_model
 from models.evaluate import evaluate_model
 from models.fashion_cnn import FashionCNN
+from utils.logger import logger
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -26,7 +27,7 @@ best_model = FashionCNN(
         activation_function=best_params['activation_function']
     ).to(device)
 
-print(best_model)
+logger.info(f"Best model architecture: {best_model}")
 
 optimizer = getattr(optim, best_params['optimizer'])(best_model.parameters(), lr=best_params['learning_rate'])
 

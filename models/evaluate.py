@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from utils.logger import logger
 
 def evaluate_model(model, test_loader, device, criterion=nn.CrossEntropyLoss()):
     """
@@ -36,6 +37,6 @@ def evaluate_model(model, test_loader, device, criterion=nn.CrossEntropyLoss()):
         val_loss = running_loss / len(test_loader)
         val_accuracy = correct / total
 
-    print(f'Test Loss: {val_loss:.4f}, Test Accuracy: {val_accuracy * 100:.2f}%')
+    logger.info(f'Test Loss: {val_loss:.4f}, Test Accuracy: {val_accuracy * 100:.2f}%')
 
     return val_loss, val_accuracy
