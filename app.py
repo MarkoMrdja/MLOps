@@ -5,7 +5,7 @@ def run_flask():
     """
     Run the Flask API.
     """
-    logger.info("Starting Flask application on host 0.0.0.0, port 5000")
+    logger.info("Starting Flask application on port 5000")
     try:
         app.run(host='0.0.0.0', port=5000, debug=False)
     except Exception as e:
